@@ -12,8 +12,9 @@
 // exportしやすいように1つのオブジェクトにまとめちゃう
 const Validator = {}
 /**
- * 名前のバリデーション
- * @param {State} state 
+ * 名前のバリデーション（純粋関数）
+ * @param {State} state
+ * @return {State} 結果のstate
  */
 Validator.validateName = function(state) {
   if (state.value) {
@@ -30,21 +31,11 @@ Validator.validateName = function(state) {
     }
   }
 }
-Validator.validateAddress = function(state) {
-  if (state.value) {
-    return {
-      ...state,
-      valid: true,
-      message: ""
-    }
-  } else {
-    return {
-      ...state,
-      valid: false,
-      message: "住所を入力してください"
-    }
-  }
-}
+/**
+ * 郵便番号のバリデーション（純粋関数）
+ * @param {State} state
+ * @return {State} 結果のstate
+ */
 Validator.validateZip = function(state) {
   if (state.value) {
     if (state.value.match(/^\d{3}-\d{4}$/)) {
@@ -68,6 +59,31 @@ Validator.validateZip = function(state) {
     }
   }
 }
+/**
+ * 住所のバリデーション（純粋関数）
+ * @param {State} state
+ * @return {State} 結果のstate
+ */
+Validator.validateAddress = function(state) {
+  if (state.value) {
+    return {
+      ...state,
+      valid: true,
+      message: ""
+    }
+  } else {
+    return {
+      ...state,
+      valid: false,
+      message: "住所を入力してください"
+    }
+  }
+}
+/**
+ * メールアドレスのバリデーション（純粋関数）
+ * @param {State} state
+ * @return {State} 結果のstate
+ */
 Validator.validateMail = function(state) {
   if (state.value) {
     if (state.value.match(/^[\w\.]+@[\w\.]+[^\.]$/)) {

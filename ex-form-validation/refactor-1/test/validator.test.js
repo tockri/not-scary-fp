@@ -1,4 +1,3 @@
-// sum.test.js
 const Validator = require('../js/validator');
 
 test("validateName check empty", () => {
