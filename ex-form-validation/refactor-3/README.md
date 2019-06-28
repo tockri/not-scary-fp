@@ -1,5 +1,5 @@
 # こわくない関数型プログラミング (7) 実例：単体テストとリファクタリング #3 〜仕様追加〜
-https://note.mu/tockri/n/na3858ba680dd
+https://note.mu/tockri/n/n5021a4d4ad6b
 
 ## 準備
 ```

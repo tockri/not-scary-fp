@@ -10,7 +10,8 @@
  */
 
 // exportしやすいように1つのオブジェクトにまとめちゃう
-const Validator = {}
+const Validator = {};
+
 /**
  * valueが空かどうかチェックする
  * @param {State} state
@@ -31,7 +32,8 @@ Validator.checkEmpty = function(state, messageIfError) {
       message: messageIfError
     }
   }
-}
+};
+
 /**
  * valueが正規表現に一致しているかチェックする
  * @param {State} state
@@ -56,7 +58,8 @@ Validator.checkPattern = function(state, pattern, messageIfError) {
       message: messageIfError
     };
   }
-}
+};
+
 /**
  * valueの全角を半角に正規化する
  * @param {State} state
@@ -72,7 +75,8 @@ Validator.normalizeToAscii = function(state) {
     ...state,
     value: toAscii(state.value)
   };
-}
+};
+
 /**
  * 郵便番号のハイフン無しをハイフン有りに正規化する
  * @param {State} state
@@ -91,7 +95,8 @@ Validator.normalizeZipFormat = function(state) {
     ...state,
     value: normalize(state.value)
   };
-}
+};
+
 /**
  * 大文字を小文字にに正規化する
  * @param {State} state
@@ -102,7 +107,8 @@ Validator.normalizeToLower = function(state) {
     ...state,
     value: state.value.toLowerCase()
   };
-}
+};
+
 /**
  * 名前のバリデーション（純粋関数）
  * @param {State} state
@@ -110,7 +116,8 @@ Validator.normalizeToLower = function(state) {
  */
 Validator.validateName = function(state) {
   return Validator.checkEmpty(state, "名前を入力してください");
-}
+};
+
 /**
  * 郵便番号のバリデーション（純粋関数）
  * @param {State} state
@@ -121,7 +128,8 @@ Validator.validateZip = function(state) {
   const state2 = Validator.normalizeZipFormat(state1);
   const state3 = Validator.checkEmpty(state2, "郵便番号を入力してください");
   return Validator.checkPattern(state3, /^\d{3}-\d{4}$/, "000-0000の形式で入力してください");
-}
+};
+
 /**
  * 住所のバリデーション（純粋関数）
  * @param {State} state
@@ -129,7 +137,8 @@ Validator.validateZip = function(state) {
  */
 Validator.validateAddress = function(state) {
   return Validator.checkEmpty(state, "住所を入力してください");
-}
+};
+
 /**
  * メールアドレスのバリデーション（純粋関数）
  * @param {State} state
@@ -139,7 +148,8 @@ Validator.validateMail = function(state) {
   const state1 = Validator.normalizeToLower(state);
   const state2 = Validator.checkEmpty(state1, "メールアドレスを入力してください");
   return Validator.checkPattern(state2, /^[\w\.]+@[\w\.]+[^\.]$/, "メールアドレスの形式が正しくありません。");
-}
+};
+
 
 
 // テスト用コード。ブラウザでは実行されない
