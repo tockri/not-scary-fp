@@ -17,7 +17,7 @@ const Validator = {}
  * @return {State} 結果のstate
  */
 Validator.validateName = function(state) {
-  if (state.value) {
+  if (state.value !== "") {
     return {
       ...state,
       valid: true,
@@ -37,7 +37,7 @@ Validator.validateName = function(state) {
  * @return {State} 結果のstate
  */
 Validator.validateZip = function(state) {
-  if (state.value) {
+  if (state.value !== "") {
     if (state.value.match(/^\d{3}-\d{4}$/)) {
       return {
         ...state,
@@ -65,7 +65,7 @@ Validator.validateZip = function(state) {
  * @return {State} 結果のstate
  */
 Validator.validateAddress = function(state) {
-  if (state.value) {
+  if (state.value !== "") {
     return {
       ...state,
       valid: true,
@@ -85,7 +85,7 @@ Validator.validateAddress = function(state) {
  * @return {State} 結果のstate
  */
 Validator.validateMail = function(state) {
-  if (state.value) {
+  if (state.value !== "") {
     if (state.value.match(/^[\w\.]+@[\w\.]+[^\.]$/)) {
       return {
         ...state,
