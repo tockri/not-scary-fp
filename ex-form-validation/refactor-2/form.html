@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+  <script src="js/form.js"></script>
+  <script src="js/validator.js"></script>
+  <title>こわくない関数型プログラミング勉強会#1</title>
+</head>
+
+<body>
+  <article class="container">
+    <h3>関数型のチェック</h3>
+    <form action="completed.html" onsubmit="return !$('#submit-button').prop('disabled');">
+      <section>
+        <h4>お客様情報</h4>
+        <br>
+        <div class="row">
+          <div class="input-field">
+            <label for="name">氏名</label>
+            <input type="text" id="name" class="validate">
+            <span id="name-helper" class="helper-text" data-error="NG" data-success="OK">例：山田 太郎</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field">
+            <label for="zipcode">郵便番号</label>
+            <input type="text" id="zip" class="validate">
+            <span id="zip-helper" class="helper-text" data-error="NG" data-success="OK">例：810-0001</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field">
+            <label for="address">住所</label>
+            <input type="text" id="address" class="validate">
+            <span id="address-helper" class="helper-text" data-error="NG" data-success="OK">例：福岡市中央区天神1-1-1</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field">
+            <label for="mail">メールアドレス</label>
+            <input type="text" id="mail" class="validate">
+            <span id="mail-helper" class="helper-text" data-error="NG" data-success="OK">例：yourname@your.domain</span>
+          </div>
+        </div>
+      </section>
+      <section>
+        <div class="row">
+          <button type="reset" class="btn" id="reset-button"
+            onclick="setTimeout(()=>checkSubmitable(),50)">Reset</button>
+          <button id="submit-button" class="btn waves-effect waves-light" type="submit" name="action" disabled>Submit
+            <i class="material-icons right">send</i>
+          </button>
+        </div>
+      </section>
+    </form>
+  </article>
+</body>
+
+</html>
