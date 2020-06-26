@@ -4,38 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
-        <th:block th:text="${m.year}"></th:block>年
-        <th:block th:text="${m.month}"></th:block>月のスケジュール
+        <th:block th:text="${m.label}"></th:block>のスケジュール
     </title>
     <link rel="stylesheet" href="/index.css">
 </head>
 <body>
     <h1>
-        <th:block th:text="${m.year}"></th:block>
-        年
-        <th:block th:text="${m.month}"></th:block>
-        月のスケジュール
+        <th:block th:text="${m.label}"></th:block>のスケジュール
     </h1>
     <div>
-        <a th:href="${'/initial/monthly/' + prev.year + '/' + prev.month}">&lt;&lt; 前の月</a>
+        <a th:href="${prev.link}">&lt;&lt; 前の月</a>
         |
-        <a th:href="${'/initial/monthly/' + next.year + '/' + next.month}">次の月 &gt;&gt;</a>
+        <a th:href="${next.link}">次の月 &gt;&gt;</a>
     </div>
     <table class="calendar">
         <thead>
             <tr>
-                <th>日</th>
+                <th class="sunday">日</th>
                 <th>月</th>
                 <th>火</th>
                 <th>水</th>
                 <th>木</th>
                 <th>金</th>
-                <th>土</th>
+                <th class="saturday">土</th>
             </tr>
         </thead>
         <tbody>
             <tr th:each="row : ${calendar.weeks}">
-                <td th:each="cell: ${row.days}">
+                <td th:each="cell: ${row.days}" th:class="${cell.cssClass}">
                     <span th:text="${cell.dayOfMonth}"></span>
                     <ul class="schedule-list">
                         <li th:each="schedule: ${cell.schedules}">
@@ -47,7 +43,7 @@
         </tbody>
     </table>
 
-    <div th:if="${schedules.size() == 0}">
+    <div th:if="${needsDemoDataGeneration}">
         <a href="/initial/demo">デモデータ生成</a>
     </div>
 </body>

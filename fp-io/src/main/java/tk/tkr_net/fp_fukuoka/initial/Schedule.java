@@ -6,14 +6,23 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+/**
+ * スケジュール
+ */
 @Entity
 public class Schedule {
     @Id
     @GeneratedValue
     private Integer id;
 
+    /**
+     * 日付
+     */
     private LocalDate date;
 
+    /**
+     * タイトル
+     */
     private String title;
 
     protected Schedule() {}

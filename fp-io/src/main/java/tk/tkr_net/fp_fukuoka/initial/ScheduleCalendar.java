@@ -8,15 +8,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 
+/**
+ * カレンダーにスケジュールを表示するためのモデル
+ */
 public class ScheduleCalendar {
     /**
      * 週を表す行
      */
     public static class WeekRow {
         private final TreeMap<LocalDate, DayCell> days = new TreeMap<>();
+        /**
+         * 日を追加
+         */
         private void add(DayCell c) {
             days.put(c.date, c);
         }
+        /**
+         * 日リスト
+         */
         public Collection<DayCell> getDays() {
             return days.values();
         }
@@ -28,8 +37,10 @@ public class ScheduleCalendar {
     public static class DayCell {
         private final ArrayList<Schedule> schedules = new ArrayList<>();
         public final LocalDate date;
-        private DayCell(LocalDate date) {
+        public final boolean inRange;
+        private DayCell(LocalDate date, boolean inRange) {
             this.date = date;
+            this.inRange = inRange;
         }
         private void add(Schedule s) {
             schedules.add(s);
@@ -39,6 +50,10 @@ public class ScheduleCalendar {
         }
         public int getDayOfMonth() {
             return date.getDayOfMonth();
+        }
+        public String getCssClass() {
+            return date.getDayOfWeek().name().toLowerCase()
+                + (inRange ? "" : " out-month");
         }
     }
 
@@ -58,7 +73,7 @@ public class ScheduleCalendar {
         while (d.isBefore(guard)) {
             var row = new WeekRow();
             for (var i = 0; i < 7; i++, d = d.plusDays(1)) {
-                var cell = new DayCell(d);
+                var cell = new DayCell(d, d.getMonthValue() == month);
                 row.add(cell);
                 days.put(d, cell);
             }
@@ -66,6 +81,9 @@ public class ScheduleCalendar {
         }
     }
 
+    /**
+     * スケジュールを追加する
+     */
     public void add(Schedule s) {
         var cell = days.get(s.getDate());
         if (cell != null) {
@@ -73,6 +91,9 @@ public class ScheduleCalendar {
         }
     }
 
+    /**
+     * 週リスト
+     */
     public List<WeekRow> getWeeks() {
         return weeks;
     }

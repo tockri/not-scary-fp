@@ -11,6 +11,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
 
+    /**
+     * 期間内のスケジュール一覧
+     */
     @Query("select s from Schedule s where s.date >= :from and s.date < :to order by s.date")
     List<Schedule> findBetween(@Param("from") LocalDate from, @Param("to") LocalDate to);
 

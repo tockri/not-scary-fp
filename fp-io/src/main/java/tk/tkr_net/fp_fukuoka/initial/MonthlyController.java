@@ -5,32 +5,48 @@ import java.time.LocalDate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/initial")
 public class MonthlyController {
+    /**
+     * 年月を表す表示用クラス
+     */
+    public static class YearMonth {
+        public final int year;
+        public final int month;
 
-    private ScheduleRepository scheduleRepository;
+        private YearMonth(int year, int month) {
+            this.year = year;
+            this.month = month;
+        }
+        /**
+         * YYYY年M月
+         */
+        public String getLabel() {
+            return year + " 年 " + month + " 月";
+        }
+
+        /**
+         * リンクURL
+         */
+        public String getLink() {
+            return "/initial/monthly/" + year + "/" + month;
+        }
+    }
+
+    private final ScheduleRepository scheduleRepository;
 
     public MonthlyController(ScheduleRepository scheduleRepository) {
         this.scheduleRepository = scheduleRepository;
     }
 
-    @GetMapping("")
-    public String root() {
-        return redirectToThisMonth();
-    }
-
-    @GetMapping("/")
-    public String redirectToThisMonth() {
-        LocalDate today = LocalDate.now();
-        int year = today.getYear();
-        int month = today.getMonth().getValue();
-        return "redirect:/initial/monthly/" + year + "/" + month;
-    }
-
+    /**
+     * 月のカレンダーを表示する
+     */
     @GetMapping("monthly/{year:\\d{4}}/{month:\\d{1,2}}")
     public String monthCalendar(Model model, @PathVariable("year") Integer year, @PathVariable("month") Integer month) {
         var from = LocalDate.of(year, month, 1);
@@ -43,17 +59,43 @@ public class MonthlyController {
         model.addAttribute("next", new YearMonth(to.getYear(), to.getMonthValue()));
         var prev = from.minusMonths(1);
         model.addAttribute("prev", new YearMonth(prev.getYear(), prev.getMonthValue()));
-        model.addAttribute("schedules", list);
         return "initial/monthly";
     }
 
     /**
-     * デモデータをランダムに発生させる（再起動時）
+     * 今月にリダイレクト
+     */
+    @GetMapping("")
+    public String root() {
+        return redirectToThisMonth();
+    }
+
+    /**
+     * 今月にリダイレクト
+     */
+    @GetMapping("/")
+    public String redirectToThisMonth() {
+        LocalDate today = LocalDate.now();
+        int year = today.getYear();
+        int month = today.getMonth().getValue();
+        return "redirect:/initial/monthly/" + year + "/" + month;
+    }
+
+    /**
+     * デモ用。scheduleRepositoryが空かどうかを調べる
+     */
+    @ModelAttribute("needsDemoDataGeneration")
+    boolean needsDemoDataGeneration() {
+        long count = scheduleRepository.count();
+        return count == 0L;
+    }
+
+    /**
+     * デモ用。ランダムデータを発生させる
      */
     @GetMapping("demo")
     public String generateDemoData() {
-        long count = scheduleRepository.count();
-        if (count == 0L) {
+        if (needsDemoDataGeneration()) {
             for (int i = 0; i < 100; i++) {
                 var date = LocalDate.now().minusDays((long) (Math.random() * 100));
                 var title = "スケジュール" + ((int) (Math.random() * 100));
@@ -64,13 +106,4 @@ public class MonthlyController {
         return "redirect:/initial";
     }
 
-    public static class YearMonth {
-        public final int year;
-        public final int month;
-
-        YearMonth(int year, int month) {
-            this.year = year;
-            this.month = month;
-        }
-    }
 }
