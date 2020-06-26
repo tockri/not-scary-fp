@@ -1,0 +1,26 @@
+table.calendar {
+    border-collapse: collapse;
+}
+table.calendar>tbody>tr {
+    height: 5em;
+}
+table.calendar th, table.calendar td {
+    border: 1px solid gray;
+    padding: 3px 10px;
+}
+table.calendar td {
+    vertical-align: top;
+    line-height: 1.1;
+}
+table.calendar th {
+    background-color: #333333;
+    color: white;
+    font-weight: normal;
+}
+
+ul.schedule-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    font-size: 80%;
+}
