@@ -11,7 +11,7 @@ import java.util.TreeMap;
 /**
  * カレンダーにスケジュールを表示するためのモデル
  */
-public class ScheduleCalendar {
+public class ScheduleCalendarDto {
     /**
      * 週を表す行
      */
@@ -60,16 +60,19 @@ public class ScheduleCalendar {
     private final ArrayList<WeekRow> weeks = new ArrayList<>();
     private final HashMap<LocalDate, DayCell> days = new HashMap<>();
 
-    public ScheduleCalendar(int year, int month) {
-        // 1日
+    /**
+     * １か月分の日曜始まりのカレンダーを生成する
+     */
+    public ScheduleCalendarDto(int year, int month) {
+        // 今月1日
         var d1 = LocalDate.of(year, month, 1);
-        // 最初の週の日曜日まで戻る
+        // 日曜日まで戻る
         var d = d1;
         while (d.getDayOfWeek() != DayOfWeek.SUNDAY) {
             d = d.minusDays(1);
         }
+        // 来月になるまでループ
         var guard = d1.plusMonths(1);
-        // 週ループ
         while (d.isBefore(guard)) {
             var row = new WeekRow();
             for (var i = 0; i < 7; i++, d = d.plusDays(1)) {

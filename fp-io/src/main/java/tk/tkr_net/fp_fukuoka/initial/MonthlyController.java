@@ -15,14 +15,15 @@ public class MonthlyController {
     /**
      * 年月を表す表示用クラス
      */
-    public static class YearMonth {
+    public static class YearMonthDto {
         public final int year;
         public final int month;
 
-        private YearMonth(int year, int month) {
-            this.year = year;
-            this.month = month;
+        private YearMonthDto(LocalDate ld) {
+            year = ld.getYear();
+            month = ld.getMonthValue();
         }
+
         /**
          * YYYY年M月
          */
@@ -49,16 +50,18 @@ public class MonthlyController {
      */
     @GetMapping("monthly/{year:\\d{4}}/{month:\\d{1,2}}")
     public String monthCalendar(Model model, @PathVariable("year") Integer year, @PathVariable("month") Integer month) {
-        var from = LocalDate.of(year, month, 1);
-        var to = from.plusMonths(1);
-        var calendar = new ScheduleCalendar(year, month);
-        var list = scheduleRepository.findBetween(from, to);
-        list.forEach(calendar::add);
+        var thisMonth = LocalDate.of(year, month, 1); // 今月1日
+        var nextMonth = thisMonth.plusMonths(1); // 来月１日
+        var prevMonth = thisMonth.minusMonths(1); // 先月１日
+
+        var calendar = new ScheduleCalendarDto(year, month);
+        for (var schedule : scheduleRepository.findBetween(thisMonth, nextMonth)) {
+            calendar.add(schedule);
+        }
         model.addAttribute("calendar", calendar);
-        model.addAttribute("m", new YearMonth(year, month));
-        model.addAttribute("next", new YearMonth(to.getYear(), to.getMonthValue()));
-        var prev = from.minusMonths(1);
-        model.addAttribute("prev", new YearMonth(prev.getYear(), prev.getMonthValue()));
+        model.addAttribute("m", new YearMonthDto(thisMonth));
+        model.addAttribute("next", new YearMonthDto(nextMonth));
+        model.addAttribute("prev", new YearMonthDto(prevMonth));
         return "initial/monthly";
     }
 
