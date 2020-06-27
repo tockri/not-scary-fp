@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 /**
- * カレンダーにスケジュールを表示するためのモデル
+ * 一か月分の日曜始まりカレンダーにスケジュールを表示するためのDTO
  */
 public class ScheduleCalendarDto {
     /**
@@ -42,15 +42,27 @@ public class ScheduleCalendarDto {
             this.date = date;
             this.inRange = inRange;
         }
+        /**
+         * スケジュールを追加
+         */
         private void add(Schedule s) {
             schedules.add(s);
         }
+        /**
+         * スケジュールのリスト
+         */
         public Collection<Schedule> getSchedules() {
             return schedules;
         }
+        /**
+         * 日付
+         */
         public int getDayOfMonth() {
             return date.getDayOfMonth();
         }
+        /**
+         * <td>タグに設定するclass属性
+         */
         public String getCssClass() {
             return date.getDayOfWeek().name().toLowerCase()
                 + (inRange ? "" : " out-month");
@@ -58,10 +70,10 @@ public class ScheduleCalendarDto {
     }
 
     private final ArrayList<WeekRow> weeks = new ArrayList<>();
-    private final HashMap<LocalDate, DayCell> days = new HashMap<>();
+    private final HashMap<LocalDate, DayCell> daysMap = new HashMap<>();
 
     /**
-     * １か月分の日曜始まりのカレンダーを生成する
+     * 一か月分の日曜始まりのカレンダーを生成する
      */
     public ScheduleCalendarDto(int year, int month) {
         // 今月1日
@@ -78,7 +90,7 @@ public class ScheduleCalendarDto {
             for (var i = 0; i < 7; i++, d = d.plusDays(1)) {
                 var cell = new DayCell(d, d.getMonthValue() == month);
                 row.add(cell);
-                days.put(d, cell);
+                daysMap.put(d, cell);
             }
             weeks.add(row);
         }
@@ -88,7 +100,7 @@ public class ScheduleCalendarDto {
      * スケジュールを追加する
      */
     public void add(Schedule s) {
-        var cell = days.get(s.getDate());
+        var cell = daysMap.get(s.getDate());
         if (cell != null) {
             cell.add(s);
         }
