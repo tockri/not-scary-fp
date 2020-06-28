@@ -1,6 +1,5 @@
 package tk.tkr_net.fp_fukuoka.service;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 
 import org.springframework.stereotype.Service;
@@ -28,16 +27,16 @@ public class ScheduleCalendarService {
         var schedules = scheduleRepository.findBetween(from, to);
 
         var dto = new ScheduleCalendarDto();
-        // 今月1日
-        var d1 = LocalDate.of(year, month, 1);
-        // 日曜日まで戻る
-        var d = d1;
-        while (d.getDayOfWeek() != DayOfWeek.SUNDAY) {
-            d = d.minusDays(1);
-        }
-        // 来月になるまでループ
-        var guard = d1.plusMonths(1);
-        while (d.isBefore(guard)) {
+        // 月の1日
+        var monthTop = from;
+        // 次月の1日
+        var nextMonthTop = monthTop.plusMonths(1);
+        // ループ用変数：月の1日を含む週の日曜日から開始
+        var d = switch (monthTop.getDayOfWeek()) {
+            case SUNDAY -> monthTop;
+            default -> monthTop.minusDays(monthTop.getDayOfWeek().getValue());
+        };
+        while (d.isBefore(nextMonthTop)) {
             var weekRow = new WeekRowDto();
             for (var i = 0; i < 7; i++, d = d.plusDays(1)) { // 日曜～土曜の7日間
                 var dayCell = new DayCellDto(d, d.getMonthValue() == month);

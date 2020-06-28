@@ -1,7 +1,7 @@
 package tk.tkr_net.fp_fukuoka.dto;
 
 import java.time.LocalDate;
-import java.util.Collection;
+import java.util.List;
 import java.util.TreeMap;
 
 /**
@@ -20,7 +20,7 @@ public class WeekRowDto {
     /**
      * 日リスト
      */
-    public Collection<DayCellDto> getDays() {
-        return days.values();
+    public List<DayCellDto> getDays() {
+        return List.copyOf(days.values());
     }
 }

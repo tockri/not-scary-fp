@@ -1,6 +1,7 @@
 package tk.tkr_net.fp_fukuoka.service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.stereotype.Service;
 
@@ -22,9 +23,10 @@ public class DemoDataService {
 
     public void generateData() {
         if (isDataEmpty()) {
+            var formatter = DateTimeFormatter.ofPattern("MM-dd");
             for (int i = 0; i < 100; i++) {
                 var date = LocalDate.now().minusDays((long) (Math.random() * 100));
-                var title = "スケジュール" + ((int) (Math.random() * 100));
+                var title = "スケジュール" + formatter.format(date);
                 var s = new Schedule(date, title);
                 scheduleRepository.save(s);
             }

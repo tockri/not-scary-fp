@@ -2,7 +2,7 @@ package tk.tkr_net.fp_fukuoka.dto;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * 日を表すセル
@@ -27,7 +27,7 @@ public class DayCellDto {
     /**
      * スケジュールのリスト
      */
-    public Collection<String> getSchedules() {
+    public List<String> getSchedules() {
         return schedules;
     }
 

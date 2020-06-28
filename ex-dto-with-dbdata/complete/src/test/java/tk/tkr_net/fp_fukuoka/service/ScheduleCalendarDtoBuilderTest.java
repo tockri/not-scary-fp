@@ -38,24 +38,6 @@ public class ScheduleCalendarDtoBuilderTest {
     }
 
     @Test
-    public void ScheduleCalendarDtoBuilder_build2_正常系() {
-        var schedules = List.of(
-            new Schedule(LocalDate.of(2020, 6, 5), "6月5日-1"),
-            new Schedule(LocalDate.of(2020, 6, 30), "6月30日"),
-            new Schedule(LocalDate.of(2020, 7, 1), "7月1日"),
-            new Schedule(LocalDate.of(2020, 6, 5), "6月5日-2")
-        );
-        var dto = ScheduleCalendarDtoBuilder.build2(2020, 6, schedules);
-        assertEquals(5, dto.weeks.size());
-        assertEquals(7, dto.weeks.get(0).days.size());
-        assertEquals(2, dto.weeks.get(0).days.get(5).schedules.size());
-        assertEquals("6月5日-1", dto.weeks.get(0).days.get(5).schedules.get(0));
-        assertEquals("6月5日-2", dto.weeks.get(0).days.get(5).schedules.get(1));
-        assertEquals("6月30日", dto.weeks.get(4).days.get(2).schedules.get(0));
-        assertEquals("7月1日", dto.weeks.get(4).days.get(3).schedules.get(0));
-    }
-
-    @Test
     public void DayCellDto＿getter_正常系() {
         var dto = new DayCellDto(LocalDate.of(2020, 6, 10), true, List.of("title1", "title2"));
         assertEquals(10, dto.getDayOfMonth());
