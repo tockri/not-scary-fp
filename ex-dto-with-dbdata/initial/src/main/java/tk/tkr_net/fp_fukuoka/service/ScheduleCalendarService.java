@@ -30,7 +30,7 @@ public class ScheduleCalendarService {
             case SUNDAY -> monthTop;
             default -> monthTop.minusDays(monthTop.getDayOfWeek().getValue());
         };
-        // DBからデータ取得
+        // DBからデータを取得する
         var schedules = scheduleRepository.findBetween(monthTop, nextMonthTop);
         
         var dto = new ScheduleCalendarDto();
