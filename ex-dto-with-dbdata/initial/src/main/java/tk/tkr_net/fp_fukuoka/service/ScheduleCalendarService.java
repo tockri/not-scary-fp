@@ -26,7 +26,6 @@ public class ScheduleCalendarService {
         var to = from.plusMonths(1);
         var schedules = scheduleRepository.findBetween(from, to);
 
-        var dto = new ScheduleCalendarDto();
         // 月の1日
         var monthTop = from;
         // 次月の1日
@@ -36,6 +35,7 @@ public class ScheduleCalendarService {
             case SUNDAY -> monthTop;
             default -> monthTop.minusDays(monthTop.getDayOfWeek().getValue());
         };
+        var dto = new ScheduleCalendarDto();
         while (d.isBefore(nextMonthTop)) {
             var weekRow = new WeekRowDto();
             for (var i = 0; i < 7; i++, d = d.plusDays(1)) { // 日曜～土曜の7日間
