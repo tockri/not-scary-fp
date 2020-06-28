@@ -1,0 +1,9 @@
+spring:
+    datasource:
+        type: 'com.zaxxer.hikari.HikariDataSource'
+        driver-class-name: 'org.h2.Driver'
+        url: 'jdbc:h2:mem:contacts'
+        username: 'h2user'
+        password: ''
+        initialization-mode: 'embedded'
+    jpa.hibernate.ddl-auto: 'update'
