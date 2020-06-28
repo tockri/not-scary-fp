@@ -30,7 +30,8 @@ public class ScheduleCalendarDtoBuilder {
             for (var i = 0; i < 7; i++, d = d.plusDays(1)) { // 日曜～土曜の7日間
                 final var date = d;
                 var schedulesInDay = schedules.stream()
-                        .filter(s -> s.getDate().equals(date)).map(s -> s.getTitle())
+                        .filter(s -> s.getDate().equals(date))
+                        .map(s -> s.getTitle())
                         .collect(Collectors.toList());
                 days.add(new DayCellDto(d, d.getMonthValue() == month, schedulesInDay));
             }
