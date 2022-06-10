@@ -1,7 +1,10 @@
-import { appendError, Validated, ValidationFunc } from './validation'
+import { Validated, ValidationFunc, valid } from './validation'
 
 import { pipe } from './fp'
 
+/**
+ * ユーザー情報フォームのデータ
+ */
 export type ApplicationFormData = {
   readonly name: Validated<string>
   readonly zipCode: Validated<string>
@@ -9,21 +12,16 @@ export type ApplicationFormData = {
   readonly mailAddress: Validated<string>
 }
 
-export const isApplicationFormSubmittable = (
-  formData: ApplicationFormData
-): boolean =>
-  formData.name.isValid &&
-  formData.mailAddress.isValid &&
-  formData.address.isValid &&
-  formData.mailAddress.isValid
-
+/**
+ * 全角英数をASCII文字に変換する
+ */
 const normalizeToAscii: ValidationFunc<string> = (validated) => {
   function toAscii(str: string) {
     return str
-      .replace(/[Ａ-Ｚａ-ｚ０-９＠．]/g, function (s) {
-        return String.fromCharCode(s.charCodeAt(0) - 65248)
-      })
-      .replace(/[ー−―‐]/, '-') // いろんな横棒を半角ハイフンに正規化
+      .replace(/[Ａ-Ｚａ-ｚ０-９＠．]/g, (s) =>
+        String.fromCharCode(s.charCodeAt(0) - 65248)
+      )
+      .replace(/[ー－−―‐]/g, '-') // いろんな横棒を半角ハイフンに正規化
   }
   return {
     ...validated,
@@ -31,9 +29,12 @@ const normalizeToAscii: ValidationFunc<string> = (validated) => {
   }
 }
 
+/**
+ * 4桁～7桁の数字が入力されたら間にハイフンを入れる
+ */
 const normalizeZipFormat: ValidationFunc<string> = (validated) => {
   function normalize(str: string) {
-    const m = str.match(/^(\d{3})(\d{4})$/)
+    const m = str.match(/^(\d{3})(\d{1,4})$/)
     if (m) {
       return m[1] + '-' + m[2]
     } else {
@@ -46,28 +47,45 @@ const normalizeZipFormat: ValidationFunc<string> = (validated) => {
   }
 }
 
+/**
+ * 大文字を小文字に変換する
+ */
 const normalizeToLower: ValidationFunc<string> = (validated) => ({
   ...validated,
   value: validated.value.toLowerCase(),
 })
 
+/**
+ * 空だったらエラー
+ */
 const checkEmpty =
   (errorMessage: string): ValidationFunc<string> =>
   (validated) => {
-    if (!validated.isValid || validated.value) {
+    if (validated.hasError || validated.value) {
       return validated
     } else {
-      return appendError(validated, errorMessage)
+      return {
+        value: validated.value,
+        hasError: true,
+        errorMessage,
+      }
     }
   }
 
+/**
+ * 正規表現に一致してなかったらエラー
+ */
 const checkPattern =
   (pattern: RegExp, errorMessage: string): ValidationFunc<string> =>
   (validated) => {
-    if (!validated.isValid || validated.value.match(pattern)) {
+    if (validated.hasError || validated.value.match(pattern)) {
       return validated
     } else {
-      return appendError(validated, errorMessage)
+      return {
+        value: validated.value,
+        hasError: true,
+        errorMessage,
+      }
     }
   }
 
@@ -83,7 +101,8 @@ const validateZipCode: ValidationFunc<string> = pipe(
 )
 
 const validateAddress: ValidationFunc<string> = pipe(
-  checkEmpty('住所を入力してください')
+  checkEmpty('住所を入力してください'),
+  normalizeToAscii
 )
 
 const validateMailAddress: ValidationFunc<string> = pipe(
@@ -96,9 +115,58 @@ const validateMailAddress: ValidationFunc<string> = pipe(
   )
 )
 
-export const ApplicationFormValidator = {
+export const ApplicationFormValidator_FOR_TEST = {
   validateName,
   validateZipCode,
   validateAddress,
   validateMailAddress,
+}
+
+const initialize = (): ApplicationFormData => ({
+  name: valid(''),
+  zipCode: valid(''),
+  address: valid(''),
+  mailAddress: valid(''),
+})
+
+type ValueSetter<T> = (
+  curr: ApplicationFormData,
+  value: T
+) => ApplicationFormData
+
+const makeSetter =
+  <T>(
+    key: keyof ApplicationFormData,
+    func: ValidationFunc<T>
+  ): ValueSetter<T> =>
+  (curr, value) => ({
+    ...curr,
+    [key]: func(valid(value)),
+  })
+
+const setName = makeSetter('name', validateName)
+
+const setMailAddress = makeSetter('mailAddress', validateMailAddress)
+
+const setAddress = makeSetter('address', validateAddress)
+
+const setZipCode = makeSetter('zipCode', validateZipCode)
+
+const isSubmittable = (data: ApplicationFormData): boolean => {
+  const ok = <T>(v: Validated<T>) => !!v.value && !v.hasError
+  return (
+    ok(data.name) &&
+    ok(data.mailAddress) &&
+    ok(data.address) &&
+    ok(data.zipCode)
+  )
+}
+
+export const ApplicationFormData = {
+  initialize,
+  setName,
+  setMailAddress,
+  setAddress,
+  setZipCode,
+  isSubmittable,
 }

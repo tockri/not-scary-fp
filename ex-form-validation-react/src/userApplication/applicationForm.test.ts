@@ -1,110 +1,96 @@
-import { ApplicationFormValidator } from './applicationForm'
+import { ApplicationFormValidator_FOR_TEST } from './applicationForm'
 import { valid } from './validation'
 
+const VT = ApplicationFormValidator_FOR_TEST
+
 test('validateZipCode passes a valid zip code', () => {
-  expect(
-    ApplicationFormValidator.validateZipCode(valid('100-0001'))
-  ).toStrictEqual({
+  expect(VT.validateZipCode(valid('100-0001'))).toStrictEqual({
     value: '100-0001',
-    isValid: true,
+    hasError: false,
     errorMessage: '',
   })
 })
 
 test('validateZipCode normalize a zip code with no "-"', () => {
-  expect(
-    ApplicationFormValidator.validateZipCode(valid('1001234'))
-  ).toStrictEqual({
+  expect(VT.validateZipCode(valid('1001234'))).toStrictEqual({
     value: '100-1234',
-    isValid: true,
+    hasError: false,
     errorMessage: '',
   })
 })
 
 test('validateZipCode normalize a zip code with no "-" with CJK', () => {
-  expect(
-    ApplicationFormValidator.validateZipCode(valid('１００１２３４'))
-  ).toStrictEqual({
+  expect(VT.validateZipCode(valid('１００１２３４'))).toStrictEqual({
     value: '100-1234',
-    isValid: true,
+    hasError: false,
     errorMessage: '',
   })
 })
 
 test('validateZipCode rejects a invalid zip code', () => {
-  expect(
-    ApplicationFormValidator.validateZipCode(valid('１００１２−３４'))
-  ).toStrictEqual({
+  expect(VT.validateZipCode(valid('１００１２−３４'))).toStrictEqual({
     value: '10012-34',
-    isValid: false,
+    hasError: true,
     errorMessage: '000-0000の書式で入力してください',
   })
 })
 
 test('validateZipCode rejects an empty string', () => {
-  expect(ApplicationFormValidator.validateZipCode(valid(''))).toStrictEqual({
+  expect(VT.validateZipCode(valid(''))).toStrictEqual({
     value: '',
-    isValid: false,
+    hasError: true,
     errorMessage: '郵便番号を入力してください',
   })
 })
 
 test('validateName rejects an empty string', () => {
-  expect(ApplicationFormValidator.validateName(valid(''))).toStrictEqual({
+  expect(VT.validateName(valid(''))).toStrictEqual({
     value: '',
-    isValid: false,
+    hasError: true,
     errorMessage: '名前を入力してください',
   })
 })
 
 test('validateAddress rejects an empty string', () => {
-  expect(ApplicationFormValidator.validateAddress(valid(''))).toStrictEqual({
+  expect(VT.validateAddress(valid(''))).toStrictEqual({
     value: '',
-    isValid: false,
+    hasError: true,
     errorMessage: '住所を入力してください',
   })
 })
 
 test('validateMailAddress rejects an empty string', () => {
-  expect(ApplicationFormValidator.validateMailAddress(valid(''))).toStrictEqual(
-    {
-      value: '',
-      isValid: false,
-      errorMessage: 'メールアドレスを入力してください',
-    }
-  )
+  expect(VT.validateMailAddress(valid(''))).toStrictEqual({
+    value: '',
+    hasError: true,
+    errorMessage: 'メールアドレスを入力してください',
+  })
 })
 
 test('validateMailAddress normalizes to ascii letter', () => {
   expect(
-    ApplicationFormValidator.validateMailAddress(
-      valid('ｓｔ＠ｅｘａｍｐｌｅ．ｃｏｍ')
-    )
+    VT.validateMailAddress(valid('ｓｔ＠ｅｘａｍｐｌｅ．ｃｏｍ'))
   ).toStrictEqual({
     value: 'st@example.com',
-    isValid: true,
+    hasError: false,
     errorMessage: '',
   })
 })
 
 test('validateMailAddress normalizes to lower-case letter', () => {
   expect(
-    ApplicationFormValidator.validateMailAddress(
-      valid('ｓｔ＠ＥＸＡｍｐｌｅ．ｃｏｍ')
-    )
+    VT.validateMailAddress(valid('ｓｔ＠ＥＸＡｍｐｌｅ．ｃｏｍ'))
   ).toStrictEqual({
     value: 'st@example.com',
-    isValid: true,
+    hasError: false,
     errorMessage: '',
   })
 })
 
 test('validateMailAddress rejects invalid pattern', () => {
-  expect(
-    ApplicationFormValidator.validateMailAddress(valid('not.a.email.address'))
-  ).toStrictEqual({
+  expect(VT.validateMailAddress(valid('not.a.email.address'))).toStrictEqual({
     value: 'not.a.email.address',
-    isValid: false,
+    hasError: true,
     errorMessage: 'メールアドレスの形式が正しくありません',
   })
 })

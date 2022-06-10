@@ -1,12 +1,11 @@
+import { Container } from '@mui/material'
 import React from 'react'
 import { UserApplicationForm } from './userApplication/Form'
 
-function App() {
+export const App: React.FC = () => {
   return (
-    <div>
+    <Container>
       <UserApplicationForm />
-    </div>
+    </Container>
   )
 }
-
-export default App
