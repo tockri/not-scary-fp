@@ -60,53 +60,62 @@ const normalizeToLower: ValidationFunc<string> = (validated) => ({
  */
 const checkEmpty =
   (errorMessage: string): ValidationFunc<string> =>
-  (validated) => {
-    if (validated.hasError || validated.value) {
-      return validated
-    } else {
-      return {
-        value: validated.value,
-        hasError: true,
-        errorMessage,
+    (validated) => {
+      if (validated.hasError || validated.value) {
+        return validated
+      } else {
+        return {
+          value: validated.value,
+          hasError: true,
+          errorMessage,
+        }
       }
     }
-  }
 
 /**
  * 正規表現に一致してなかったらエラー
  */
 const checkPattern =
   (pattern: RegExp, errorMessage: string): ValidationFunc<string> =>
-  (validated) => {
-    if (validated.hasError || validated.value.match(pattern)) {
-      return validated
-    } else {
-      return {
-        value: validated.value,
-        hasError: true,
-        errorMessage,
+    (validated) => {
+      if (validated.hasError || validated.value.match(pattern)) {
+        return validated
+      } else {
+        return {
+          value: validated.value,
+          hasError: true,
+          errorMessage,
+        }
       }
     }
-  }
 
 const validateName: ValidationFunc<string> = pipe(
   checkEmpty('名前を入力してください')
 )
 
 const validateZipCode: ValidationFunc<string> = pipe(
-  checkEmpty('郵便番号を入力してください'),
+  checkEmpty('郵便番号を入力してください')
+)
+
+const normalizeZipCode: ValidationFunc<string> = pipe(
   normalizeToAscii,
   normalizeZipFormat,
   checkPattern(/^\d{3}-\d{4}$/, '000-0000の書式で入力してください')
 )
 
 const validateAddress: ValidationFunc<string> = pipe(
-  checkEmpty('住所を入力してください'),
+  checkEmpty('住所を入力してください')
+)
+
+const normalizeAddress: ValidationFunc<string> = pipe(
   normalizeToAscii
 )
 
 const validateMailAddress: ValidationFunc<string> = pipe(
   checkEmpty('メールアドレスを入力してください'),
+)
+
+const normalizeMailAddress: ValidationFunc<string> = pipe(
   normalizeToAscii,
   normalizeToLower,
   checkPattern(
@@ -116,10 +125,10 @@ const validateMailAddress: ValidationFunc<string> = pipe(
 )
 
 export const ApplicationFormValidator_FOR_TEST = {
-  validateName,
-  validateZipCode,
-  validateAddress,
-  validateMailAddress,
+  validateName: validateName,
+  validateZipCode: pipe(validateZipCode, normalizeZipCode),
+  validateAddress: pipe(validateAddress, normalizeAddress),
+  validateMailAddress: pipe(validateMailAddress, normalizeMailAddress),
 }
 
 const initialize = (): ApplicationFormData => ({
@@ -129,7 +138,7 @@ const initialize = (): ApplicationFormData => ({
   mailAddress: valid(''),
 })
 
-type ValueSetter<T> = (
+export type ApplicationFormValueSetter<T> = (
   curr: ApplicationFormData,
   value: T
 ) => ApplicationFormData
@@ -138,19 +147,11 @@ const makeSetter =
   <T>(
     key: keyof ApplicationFormData,
     func: ValidationFunc<T>
-  ): ValueSetter<T> =>
-  (curr, value) => ({
-    ...curr,
-    [key]: func(valid(value)),
-  })
-
-const setName = makeSetter('name', validateName)
-
-const setMailAddress = makeSetter('mailAddress', validateMailAddress)
-
-const setAddress = makeSetter('address', validateAddress)
-
-const setZipCode = makeSetter('zipCode', validateZipCode)
+  ): ApplicationFormValueSetter<T> =>
+    (curr, value) => ({
+      ...curr,
+      [key]: func(valid(value)),
+    })
 
 const isSubmittable = (data: ApplicationFormData): boolean => {
   const ok = <T>(v: Validated<T>) => !!v.value && !v.hasError
@@ -164,9 +165,12 @@ const isSubmittable = (data: ApplicationFormData): boolean => {
 
 export const ApplicationFormData = {
   initialize,
-  setName,
-  setMailAddress,
-  setAddress,
-  setZipCode,
+  setName: makeSetter('name', validateName),
+  setMailAddress: makeSetter('mailAddress', validateMailAddress),
+  normalizeMailAddress: makeSetter('mailAddress', normalizeMailAddress),
+  setAddress: makeSetter('address', validateAddress),
+  normalizeAddress: makeSetter('address', normalizeAddress),
+  setZipCode: makeSetter('zipCode', validateZipCode),
+  normalizeZipCode: makeSetter('zipCode', normalizeZipCode),
   isSubmittable,
 }

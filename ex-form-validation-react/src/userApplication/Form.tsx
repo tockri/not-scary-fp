@@ -1,11 +1,14 @@
 import React from 'react'
 import { Box, Button, Stack, TextField, Typography } from '@mui/material'
-import { ApplicationFormData } from './applicationForm'
+import { ApplicationFormData, ApplicationFormValueSetter } from './applicationForm'
 
 export const UserApplicationForm: React.FC = () => {
   const [formData, setFormData] = React.useState<ApplicationFormData>(
     ApplicationFormData.initialize()
   )
+  const makeListener = (setter: ApplicationFormValueSetter<string>) => (e: { target: { value: string } }) => {
+    setFormData((curr) => setter(curr, e.target.value))
+  }
 
   return (
     <Box p={2}>
@@ -15,10 +18,10 @@ export const UserApplicationForm: React.FC = () => {
         onSubmit={() => {
           alert(
             '以下の情報を送信しました（してません）。\n' +
-              `名前: ${formData.name.value}\n` +
-              `メールアドレス: ${formData.mailAddress.value}\n` +
-              `郵便番号: ${formData.zipCode.value}\n` +
-              `住所: ${formData.address.value}`
+            `名前: ${formData.name.value}\n` +
+            `メールアドレス: ${formData.mailAddress.value}\n` +
+            `郵便番号: ${formData.zipCode.value}\n` +
+            `住所: ${formData.address.value}`
           )
         }}
       >
@@ -33,11 +36,7 @@ export const UserApplicationForm: React.FC = () => {
               variant="outlined"
               size="small"
               value={formData.name.value}
-              onChange={(e) => {
-                setFormData((curr) =>
-                  ApplicationFormData.setName(curr, e.target.value)
-                )
-              }}
+              onChange={makeListener(ApplicationFormData.setName)}
               error={formData.name.hasError}
               helperText={formData.name.errorMessage}
             />
@@ -49,11 +48,8 @@ export const UserApplicationForm: React.FC = () => {
               variant="outlined"
               size="small"
               value={formData.mailAddress.value}
-              onChange={(e) =>
-                setFormData((curr) =>
-                  ApplicationFormData.setMailAddress(curr, e.target.value)
-                )
-              }
+              onChange={makeListener(ApplicationFormData.setMailAddress)}
+              onBlur={makeListener(ApplicationFormData.normalizeMailAddress)}
               error={formData.mailAddress.hasError}
               helperText={formData.mailAddress.errorMessage}
             />
@@ -65,11 +61,8 @@ export const UserApplicationForm: React.FC = () => {
               variant="outlined"
               size="small"
               value={formData.zipCode.value}
-              onChange={(e) =>
-                setFormData((curr) =>
-                  ApplicationFormData.setZipCode(curr, e.target.value)
-                )
-              }
+              onChange={makeListener(ApplicationFormData.setZipCode)}
+              onBlur={makeListener(ApplicationFormData.normalizeZipCode)}
               error={formData.zipCode.hasError}
               helperText={formData.zipCode.errorMessage}
             />
@@ -81,11 +74,8 @@ export const UserApplicationForm: React.FC = () => {
               variant="outlined"
               size="small"
               value={formData.address.value}
-              onChange={(e) =>
-                setFormData((curr) =>
-                  ApplicationFormData.setAddress(curr, e.target.value)
-                )
-              }
+              onChange={makeListener(ApplicationFormData.setAddress)}
+              onBlur={makeListener(ApplicationFormData.normalizeAddress)}
               error={formData.address.hasError}
               helperText={formData.address.errorMessage}
             />
