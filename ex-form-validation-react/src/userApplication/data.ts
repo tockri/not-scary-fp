@@ -1,6 +1,6 @@
-import { Validated, ValidationFunc, valid } from './validation'
+import { Validated, ValidationFunc, valid } from '../common/validation'
 
-import { pipe } from './fp'
+import { pipe } from '../common/fp'
 
 /**
  * ユーザー情報フォームのデータ

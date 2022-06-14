@@ -1,5 +1,5 @@
-import { ApplicationFormData, ApplicationFormValidator_FOR_TEST } from './applicationForm'
-import { valid, Validated } from './validation'
+import { ApplicationFormData, ApplicationFormValidator_FOR_TEST } from './data'
+import { valid, Validated } from '../common/validation'
 
 const VT = ApplicationFormValidator_FOR_TEST
 

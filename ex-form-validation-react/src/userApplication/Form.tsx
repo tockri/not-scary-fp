@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box, Button, Stack, TextField, Typography } from '@mui/material'
-import { ApplicationFormData, ApplicationFormValueSetter } from './applicationForm'
+import { ApplicationFormData, ApplicationFormValueSetter } from './data'
 
 export const UserApplicationForm: React.FC = () => {
   const [formData, setFormData] = React.useState<ApplicationFormData>(
