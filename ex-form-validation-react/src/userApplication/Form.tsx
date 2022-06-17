@@ -1,14 +1,22 @@
-import React from 'react'
 import { Box, Button, Stack, TextField, Typography } from '@mui/material'
-import { ApplicationFormData, ApplicationFormValueSetter } from './data'
+import React from 'react'
+import {
+  UserApplicationFormData,
+  UserApplicationFormDataFunctions,
+  UserApplicationFormDataSetter,
+} from './data'
+
+const UF = UserApplicationFormDataFunctions
 
 export const UserApplicationForm: React.FC = () => {
-  const [formData, setFormData] = React.useState<ApplicationFormData>(
-    ApplicationFormData.initialize()
+  const [formData, setFormData] = React.useState<UserApplicationFormData>(
+    UF.initialize()
   )
-  const makeListener = (setter: ApplicationFormValueSetter<string>) => (e: { target: { value: string } }) => {
-    setFormData((curr) => setter(curr, e.target.value))
-  }
+  const makeListener =
+    (setter: UserApplicationFormDataSetter) =>
+    (e: { target: { value: string } }) => {
+      setFormData((curr) => setter(curr, e.target.value))
+    }
 
   return (
     <Box p={2}>
@@ -18,10 +26,10 @@ export const UserApplicationForm: React.FC = () => {
         onSubmit={() => {
           alert(
             '以下の情報を送信しました（してません）。\n' +
-            `名前: ${formData.name.value}\n` +
-            `メールアドレス: ${formData.mailAddress.value}\n` +
-            `郵便番号: ${formData.zipCode.value}\n` +
-            `住所: ${formData.address.value}`
+              `名前: ${formData.name.value}\n` +
+              `メールアドレス: ${formData.mailAddress.value}\n` +
+              `郵便番号: ${formData.zipCode.value}\n` +
+              `住所: ${formData.address.value}`
           )
         }}
       >
@@ -36,7 +44,7 @@ export const UserApplicationForm: React.FC = () => {
               variant="outlined"
               size="small"
               value={formData.name.value}
-              onChange={makeListener(ApplicationFormData.setName)}
+              onChange={makeListener(UF.setNameOnTyping)}
               error={formData.name.hasError}
               helperText={formData.name.errorMessage}
             />
@@ -48,8 +56,8 @@ export const UserApplicationForm: React.FC = () => {
               variant="outlined"
               size="small"
               value={formData.mailAddress.value}
-              onChange={makeListener(ApplicationFormData.setMailAddress)}
-              onBlur={makeListener(ApplicationFormData.normalizeMailAddress)}
+              onChange={makeListener(UF.setMailAddressOnTyping)}
+              onBlur={makeListener(UF.setMailAddressOnFinish)}
               error={formData.mailAddress.hasError}
               helperText={formData.mailAddress.errorMessage}
             />
@@ -61,8 +69,8 @@ export const UserApplicationForm: React.FC = () => {
               variant="outlined"
               size="small"
               value={formData.zipCode.value}
-              onChange={makeListener(ApplicationFormData.setZipCode)}
-              onBlur={makeListener(ApplicationFormData.normalizeZipCode)}
+              onChange={makeListener(UF.setZipCodeOnTyping)}
+              onBlur={makeListener(UF.setZipCodeOnFinish)}
               error={formData.zipCode.hasError}
               helperText={formData.zipCode.errorMessage}
             />
@@ -74,8 +82,8 @@ export const UserApplicationForm: React.FC = () => {
               variant="outlined"
               size="small"
               value={formData.address.value}
-              onChange={makeListener(ApplicationFormData.setAddress)}
-              onBlur={makeListener(ApplicationFormData.normalizeAddress)}
+              onChange={makeListener(UF.setAddressOnTyping)}
+              onBlur={makeListener(UF.setAddressOnFinish)}
               error={formData.address.hasError}
               helperText={formData.address.errorMessage}
             />
@@ -84,7 +92,7 @@ export const UserApplicationForm: React.FC = () => {
             <Button
               type="submit"
               variant="contained"
-              disabled={!ApplicationFormData.isSubmittable(formData)}
+              disabled={!UF.isSubmittable(formData)}
             >
               送信
             </Button>

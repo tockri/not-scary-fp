@@ -1,96 +1,126 @@
-import { ApplicationFormData, ApplicationFormValidator_FOR_TEST } from './data'
-import { valid, Validated } from '../common/validation'
+import {
+  UserApplicationFormData,
+  UserApplicationFormData_FOR_TEST,
+  UserApplicationFormDataFunctions,
+} from './data'
+import { formInput, FormInputValue } from '../common/formInputValue'
 
-const VT = ApplicationFormValidator_FOR_TEST
+const VT = UserApplicationFormData_FOR_TEST
+const Handler = UserApplicationFormDataFunctions
 
-test('validateZipCode passes a valid zip code', () => {
-  expect(VT.validateZipCode(valid('100-0001'))).toStrictEqual<Validated<string>>({
+test('checkPattern passes a valid zip code', () => {
+  expect(
+    VT.checkPattern(/\d{3}-\d{4}/, '')(formInput('100-0001'))
+  ).toStrictEqual<FormInputValue<string>>({
     value: '100-0001',
     hasError: false,
     errorMessage: '',
   })
 })
 
-test('validateZipCode normalize a zip code with no "-"', () => {
-  expect(VT.validateZipCode(valid('1001234'))).toStrictEqual<Validated<string>>({
-    value: '100-1234',
-    hasError: false,
-    errorMessage: '',
-  })
-})
-
-test('validateZipCode normalize a zip code with no "-" with CJK', () => {
-  expect(VT.validateZipCode(valid('１００１２３４'))).toStrictEqual<Validated<string>>({
-    value: '100-1234',
-    hasError: false,
-    errorMessage: '',
-  })
-})
-
-test('validateZipCode rejects a invalid zip code', () => {
-  expect(VT.validateZipCode(valid('１００１２−３４'))).toStrictEqual<Validated<string>>({
-    value: '10012-34',
+test('checkPattern rejects if not match', () => {
+  expect(
+    VT.checkPattern(/^\d{3}-\d{4}$/, 'not match')(formInput('abc'))
+  ).toStrictEqual<FormInputValue<string>>({
+    value: 'abc',
     hasError: true,
-    errorMessage: '000-0000の書式で入力してください',
+    errorMessage: 'not match',
   })
 })
 
-test('validateZipCode rejects an empty string', () => {
-  expect(VT.validateZipCode(valid(''))).toStrictEqual<Validated<string>>({
+test('normalizeZipFormat normalize a zip code with no "-"', () => {
+  expect(VT.normalizeZipFormat(formInput('1001234'))).toStrictEqual<
+    FormInputValue<string>
+  >({
+    value: '100-1234',
+    hasError: false,
+    errorMessage: '',
+  })
+})
+
+test('normalizeToAscii normalize a zip code with no "-" with CJK', () => {
+  expect(VT.normalizeToAscii(formInput('１００-１２３４'))).toStrictEqual<
+    FormInputValue<string>
+  >({
+    value: '100-1234',
+    hasError: false,
+    errorMessage: '',
+  })
+})
+
+test('checkEmpty rejects an empty string', () => {
+  expect(VT.checkEmpty('empty')(formInput(''))).toStrictEqual<
+    FormInputValue<string>
+  >({
     value: '',
     hasError: true,
-    errorMessage: '郵便番号を入力してください',
+    errorMessage: 'empty',
   })
 })
+
+const initial = Handler.initialize()
 
 test('validateName rejects an empty string', () => {
-  expect(VT.validateName(valid(''))).toStrictEqual<Validated<string>>({
-    value: '',
-    hasError: true,
-    errorMessage: '名前を入力してください',
+  expect(
+    Handler.setNameOnTyping(initial, '')
+  ).toStrictEqual<UserApplicationFormData>({
+    ...initial,
+    name: {
+      value: '',
+      hasError: true,
+      errorMessage: '名前を入力してください',
+    },
   })
 })
 
-test('validateAddress rejects an empty string', () => {
-  expect(VT.validateAddress(valid(''))).toStrictEqual<Validated<string>>({
-    value: '',
-    hasError: true,
-    errorMessage: '住所を入力してください',
+test('validateAddressOnTyping rejects an empty string', () => {
+  expect(
+    Handler.setAddressOnTyping(initial, '')
+  ).toStrictEqual<UserApplicationFormData>({
+    ...initial,
+    address: {
+      value: '',
+      hasError: true,
+      errorMessage: '住所を入力してください',
+    },
   })
 })
 
 test('validateMailAddress rejects an empty string', () => {
-  expect(VT.validateMailAddress(valid(''))).toStrictEqual<Validated<string>>({
-    value: '',
-    hasError: true,
-    errorMessage: 'メールアドレスを入力してください',
-  })
-})
-
-test('validateMailAddress normalizes to ascii letter', () => {
   expect(
-    VT.validateMailAddress(valid('ｓｔ＠ｅｘａｍｐｌｅ．ｃｏｍ'))
-  ).toStrictEqual<Validated<string>>({
-    value: 'st@example.com',
-    hasError: false,
-    errorMessage: '',
+    Handler.setMailAddressOnTyping(initial, '')
+  ).toStrictEqual<UserApplicationFormData>({
+    ...initial,
+    mailAddress: {
+      value: '',
+      hasError: true,
+      errorMessage: 'メールアドレスを入力してください',
+    },
   })
 })
 
-test('validateMailAddress normalizes to lower-case letter', () => {
+test('normalizeMailAddress normalizes to ascii letter', () => {
   expect(
-    VT.validateMailAddress(valid('ｓｔ＠ＥＸＡｍｐｌｅ．ｃｏｍ'))
-  ).toStrictEqual<Validated<string>>({
-    value: 'st@example.com',
-    hasError: false,
-    errorMessage: '',
+    Handler.setMailAddressOnFinish(initial, 'ｓｔ＠ＥＸＡｍｐｌｅ．ｃｏｍ')
+  ).toStrictEqual<UserApplicationFormData>({
+    ...initial,
+    mailAddress: {
+      value: 'st@example.com',
+      hasError: false,
+      errorMessage: '',
+    },
   })
 })
 
-test('validateMailAddress rejects invalid pattern', () => {
-  expect(VT.validateMailAddress(valid('not.a.email.address'))).toStrictEqual<Validated<string>>({
-    value: 'not.a.email.address',
-    hasError: true,
-    errorMessage: 'メールアドレスの形式が正しくありません',
+test('normalizeMailAddress rejects invalid pattern', () => {
+  expect(
+    Handler.setMailAddressOnFinish(initial, 'not.a.email.address')
+  ).toStrictEqual<UserApplicationFormData>({
+    ...initial,
+    mailAddress: {
+      value: 'not.a.email.address',
+      hasError: true,
+      errorMessage: 'メールアドレスの形式が正しくありません',
+    },
   })
 })
