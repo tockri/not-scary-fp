@@ -1,35 +1,36 @@
 import { Box, Button, Stack, TextField, Typography } from '@mui/material'
 import React from 'react'
 import {
-  UserApplicationFormData,
-  UserApplicationFormDataFunctions,
-  UserApplicationFormDataSetter,
-} from './data'
+  FormData,
+  FormDataFunctions,
+  FormDataSetter,
+} from './formData'
 
-const UF = UserApplicationFormDataFunctions
+const Funcs = FormDataFunctions
 
 export const UserApplicationForm: React.FC = () => {
-  const [formData, setFormData] = React.useState<UserApplicationFormData>(
-    UF.initialize()
+  const [formData, setFormData] = React.useState<FormData>(
+    Funcs.initialize()
   )
   const makeListener =
-    (setter: UserApplicationFormDataSetter) =>
-    (e: { target: { value: string } }) => {
-      setFormData((curr) => setter(curr, e.target.value))
-    }
+    (setter: FormDataSetter) =>
+      (e: { target: { value: string } }) => {
+        setFormData((curr) => setter(curr, e.target.value))
+      }
 
   return (
     <Box p={2}>
       <form
         method="post"
-        action="javascript:void(0)"
-        onSubmit={() => {
+        action=""
+        onSubmit={(e) => {
+          e.preventDefault()
           alert(
             '以下の情報を送信しました（してません）。\n' +
-              `名前: ${formData.name.value}\n` +
-              `メールアドレス: ${formData.mailAddress.value}\n` +
-              `郵便番号: ${formData.zipCode.value}\n` +
-              `住所: ${formData.address.value}`
+            `名前: ${formData.name.value}\n` +
+            `メールアドレス: ${formData.mailAddress.value}\n` +
+            `郵便番号: ${formData.zipCode.value}\n` +
+            `住所: ${formData.address.value}`
           )
         }}
       >
@@ -44,7 +45,7 @@ export const UserApplicationForm: React.FC = () => {
               variant="outlined"
               size="small"
               value={formData.name.value}
-              onChange={makeListener(UF.setNameOnTyping)}
+              onChange={makeListener(Funcs.setNameOnTyping)}
               error={formData.name.hasError}
               helperText={formData.name.errorMessage}
             />
@@ -56,8 +57,8 @@ export const UserApplicationForm: React.FC = () => {
               variant="outlined"
               size="small"
               value={formData.mailAddress.value}
-              onChange={makeListener(UF.setMailAddressOnTyping)}
-              onBlur={makeListener(UF.setMailAddressOnFinish)}
+              onChange={makeListener(Funcs.setMailAddressOnTyping)}
+              onBlur={makeListener(Funcs.setMailAddressOnFinish)}
               error={formData.mailAddress.hasError}
               helperText={formData.mailAddress.errorMessage}
             />
@@ -69,8 +70,8 @@ export const UserApplicationForm: React.FC = () => {
               variant="outlined"
               size="small"
               value={formData.zipCode.value}
-              onChange={makeListener(UF.setZipCodeOnTyping)}
-              onBlur={makeListener(UF.setZipCodeOnFinish)}
+              onChange={makeListener(Funcs.setZipCodeOnTyping)}
+              onBlur={makeListener(Funcs.setZipCodeOnFinish)}
               error={formData.zipCode.hasError}
               helperText={formData.zipCode.errorMessage}
             />
@@ -82,8 +83,8 @@ export const UserApplicationForm: React.FC = () => {
               variant="outlined"
               size="small"
               value={formData.address.value}
-              onChange={makeListener(UF.setAddressOnTyping)}
-              onBlur={makeListener(UF.setAddressOnFinish)}
+              onChange={makeListener(Funcs.setAddressOnTyping)}
+              onBlur={makeListener(Funcs.setAddressOnFinish)}
               error={formData.address.hasError}
               helperText={formData.address.errorMessage}
             />
@@ -92,7 +93,7 @@ export const UserApplicationForm: React.FC = () => {
             <Button
               type="submit"
               variant="contained"
-              disabled={!UF.isSubmittable(formData)}
+              disabled={!Funcs.isSubmittable(formData)}
             >
               送信
             </Button>
