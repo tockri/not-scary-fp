@@ -2,7 +2,7 @@ import {
   Validated,
   createValidated,
   ValidationFunc,
-} from '../common/formInputValue'
+} from '../common/validated'
 
 import { pipe } from '../common/fp'
 

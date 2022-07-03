@@ -3,7 +3,7 @@ import {
   FormDataFunctions_FOR_TEST,
   FormDataFunctions,
 } from './formData'
-import { Validated, createValidated } from '../common/formInputValue'
+import { Validated, createValidated } from '../common/validated'
 
 const Priv = FormDataFunctions_FOR_TEST
 const Funcs = FormDataFunctions
