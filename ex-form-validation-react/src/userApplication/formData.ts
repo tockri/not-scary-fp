@@ -27,7 +27,7 @@ const normalizeToAscii: ValidationFunc<string> = (validated) => {
  * 4桁～7桁の数字が入力されたら間にハイフンを入れる
  */
 const normalizeZipFormat: ValidationFunc<string> = (validated) => {
-  function normalize(str: string) {
+  function formatZip(str: string) {
     const m = str.match(/^(\d{3})(\d{1,4})$/)
     if (m) {
       return m[1] + '-' + m[2]
@@ -37,10 +37,9 @@ const normalizeZipFormat: ValidationFunc<string> = (validated) => {
   }
   return {
     ...validated,
-    value: normalize(validated.value),
+    value: formatZip(validated.value),
   }
 }
-
 
 /**
  * 大文字を小文字に変換する
@@ -117,60 +116,70 @@ export type FormDataSetter = (
   value: string
 ) => FormData
 
-const setNameOnTyping: FormDataSetter = (curr, value) => ({
-  ...curr,
-  name: checkEmpty('名前を入力してください')(createValidated(value)),
-})
+/**
+ * FormDataStterの関数を短いコードで生成する糖衣
+ */
+const makeSetter = (key: keyof FormData, ...functions: ValidationFunc<string>[]): FormDataSetter =>
+  (curr, value) => ({
+    ...curr,
+    [key]: pipe(...functions)(createValidated(value))
+  })
 
-const setMailAddressOnTyping: FormDataSetter = (
-  curr,
-  value
-) => ({
-  ...curr,
-  mailAddress: checkEmpty('メールアドレスを入力してください')(
-    createValidated(value)
-  ),
-})
+/**
+ * 名前の入力時にリアルタイムでエラーをチェックする
+ */
+const setNameOnTyping = makeSetter('name',
+  checkEmpty('名前を入力してください'))
 
-const setMailAddressOnFinish: FormDataSetter = (
-  curr,
-  value
-) => ({
-  ...curr,
-  mailAddress: pipe(
-    normalizeToAscii,
-    normalizeToLower,
-    checkPattern(
-      /^[\w.]+@[\w.]+[^.]$/, // この正規表現は嘘なので使ってはいけません。
-      'メールアドレスの形式が正しくありません'
-    )
-  )(createValidated(value)),
-})
+/**
+ * メールアドレスの入力時にリアルタイムでエラーをチェックする
+ */
+const setMailAddressOnTyping = makeSetter('mailAddress',
+  checkEmpty('メールアドレスを入力してください'))
 
-const setZipCodeOnTyping: FormDataSetter = (curr, value) => ({
-  ...curr,
-  zipCode: checkEmpty('郵便番号を入力してください')(createValidated(value)),
-})
+/**
+ * メールアドレスの入力完了時に内容を更新しつつエラーをチェックする
+ */
+const setMailAddressOnFinish = makeSetter('mailAddress',
+  normalizeToAscii,
+  normalizeToLower,
+  checkPattern(
+    /^[\w.]+@[\w.]+[^.]$/, // この正規表現は嘘なので使ってはいけません。
+    'メールアドレスの形式が正しくありません'
+  )
+)
 
-const setZipCodeOnFinish: FormDataSetter = (curr, value) => ({
-  ...curr,
-  zipCode: pipe(
-    normalizeToAscii,
-    normalizeZipFormat,
-    checkPattern(/^\d{3}-\d{4}$/, '000-0000の書式で入力してください')
-  )(createValidated(value)),
-})
+/**
+ * 郵便番号の入力時にリアルタイムでエラーをチェックする
+ */
+const setZipCodeOnTyping = makeSetter('zipCode',
+  checkEmpty('郵便番号を入力してください'))
 
-const setAddressOnTyping: FormDataSetter = (curr, value) => ({
-  ...curr,
-  address: checkEmpty('住所を入力してください')(createValidated(value)),
-})
+/**
+ * 郵便番号の入力完了時に内容を更新しつつエラーをチェックする
+ */
+const setZipCodeOnFinish = makeSetter('zipCode',
+  normalizeToAscii,
+  normalizeZipFormat,
+  checkPattern(/^\d{3}-\d{4}$/, '000-0000の書式で入力してください')
+)
 
-const setAddressOnFinish: FormDataSetter = (curr, value) => ({
-  ...curr,
-  address: normalizeToAscii(createValidated(value)),
-})
+/**
+ * 住所の入力時にリアルタイムでエラーをチェックする
+ */
+const setAddressOnTyping = makeSetter('address',
+  checkEmpty('住所を入力してください'))
 
+/**
+ * 住所の入力完了時に内容を更新しつつエラーをチェックする
+ */
+const setAddressOnFinish = makeSetter('address',
+  normalizeToAscii
+)
+
+/**
+ * フォームを送信していいか判定する
+ */
 const isSubmittable = (data: FormData): boolean => {
   const ok = <T>(v: Validated<T>) => !!v.value && !v.hasError
   return (
