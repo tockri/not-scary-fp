@@ -1,17 +1,17 @@
 import {
-  UserApplicationFormData,
-  UserApplicationFormData_FOR_TEST,
-  UserApplicationFormDataFunctions,
-} from './data'
-import { formInput, FormInputValue } from '../common/formInputValue'
+  FormData,
+  FormDataFunctions_FOR_TEST,
+  FormDataFunctions,
+} from './formData'
+import { Validated, createValidated } from '../common/formInputValue'
 
-const VT = UserApplicationFormData_FOR_TEST
-const Handler = UserApplicationFormDataFunctions
+const Priv = FormDataFunctions_FOR_TEST
+const Funcs = FormDataFunctions
 
 test('checkPattern passes a valid zip code', () => {
   expect(
-    VT.checkPattern(/\d{3}-\d{4}/, '')(formInput('100-0001'))
-  ).toStrictEqual<FormInputValue<string>>({
+    Priv.checkPattern(/\d{3}-\d{4}/, '')(createValidated('100-0001'))
+  ).toStrictEqual<Validated<string>>({
     value: '100-0001',
     hasError: false,
     errorMessage: '',
@@ -20,8 +20,8 @@ test('checkPattern passes a valid zip code', () => {
 
 test('checkPattern rejects if not match', () => {
   expect(
-    VT.checkPattern(/^\d{3}-\d{4}$/, 'not match')(formInput('abc'))
-  ).toStrictEqual<FormInputValue<string>>({
+    Priv.checkPattern(/^\d{3}-\d{4}$/, 'not match')(createValidated('abc'))
+  ).toStrictEqual<Validated<string>>({
     value: 'abc',
     hasError: true,
     errorMessage: 'not match',
@@ -29,8 +29,8 @@ test('checkPattern rejects if not match', () => {
 })
 
 test('normalizeZipFormat normalize a zip code with no "-"', () => {
-  expect(VT.normalizeZipFormat(formInput('1001234'))).toStrictEqual<
-    FormInputValue<string>
+  expect(Priv.normalizeZipFormat(createValidated('1001234'))).toStrictEqual<
+    Validated<string>
   >({
     value: '100-1234',
     hasError: false,
@@ -39,8 +39,8 @@ test('normalizeZipFormat normalize a zip code with no "-"', () => {
 })
 
 test('normalizeToAscii normalize a zip code with no "-" with CJK', () => {
-  expect(VT.normalizeToAscii(formInput('１００-１２３４'))).toStrictEqual<
-    FormInputValue<string>
+  expect(Priv.normalizeToAscii(createValidated('１００-１２３４'))).toStrictEqual<
+    Validated<string>
   >({
     value: '100-1234',
     hasError: false,
@@ -49,8 +49,8 @@ test('normalizeToAscii normalize a zip code with no "-" with CJK', () => {
 })
 
 test('checkEmpty rejects an empty string', () => {
-  expect(VT.checkEmpty('empty')(formInput(''))).toStrictEqual<
-    FormInputValue<string>
+  expect(Priv.checkEmpty('empty')(createValidated(''))).toStrictEqual<
+    Validated<string>
   >({
     value: '',
     hasError: true,
@@ -58,12 +58,12 @@ test('checkEmpty rejects an empty string', () => {
   })
 })
 
-const initial = Handler.initialize()
+const initial = Funcs.initialize()
 
 test('validateName rejects an empty string', () => {
   expect(
-    Handler.setNameOnTyping(initial, '')
-  ).toStrictEqual<UserApplicationFormData>({
+    Funcs.setNameOnTyping(initial, '')
+  ).toStrictEqual<FormData>({
     ...initial,
     name: {
       value: '',
@@ -75,8 +75,8 @@ test('validateName rejects an empty string', () => {
 
 test('validateAddressOnTyping rejects an empty string', () => {
   expect(
-    Handler.setAddressOnTyping(initial, '')
-  ).toStrictEqual<UserApplicationFormData>({
+    Funcs.setAddressOnTyping(initial, '')
+  ).toStrictEqual<FormData>({
     ...initial,
     address: {
       value: '',
@@ -88,8 +88,8 @@ test('validateAddressOnTyping rejects an empty string', () => {
 
 test('validateMailAddress rejects an empty string', () => {
   expect(
-    Handler.setMailAddressOnTyping(initial, '')
-  ).toStrictEqual<UserApplicationFormData>({
+    Funcs.setMailAddressOnTyping(initial, '')
+  ).toStrictEqual<FormData>({
     ...initial,
     mailAddress: {
       value: '',
@@ -101,8 +101,8 @@ test('validateMailAddress rejects an empty string', () => {
 
 test('normalizeMailAddress normalizes to ascii letter', () => {
   expect(
-    Handler.setMailAddressOnFinish(initial, 'ｓｔ＠ＥＸＡｍｐｌｅ．ｃｏｍ')
-  ).toStrictEqual<UserApplicationFormData>({
+    Funcs.setMailAddressOnFinish(initial, 'ｓｔ＠ＥＸＡｍｐｌｅ．ｃｏｍ')
+  ).toStrictEqual<FormData>({
     ...initial,
     mailAddress: {
       value: 'st@example.com',
@@ -114,8 +114,8 @@ test('normalizeMailAddress normalizes to ascii letter', () => {
 
 test('normalizeMailAddress rejects invalid pattern', () => {
   expect(
-    Handler.setMailAddressOnFinish(initial, 'not.a.email.address')
-  ).toStrictEqual<UserApplicationFormData>({
+    Funcs.setMailAddressOnFinish(initial, 'not.a.email.address')
+  ).toStrictEqual<FormData>({
     ...initial,
     mailAddress: {
       value: 'not.a.email.address',
