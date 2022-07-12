@@ -3,14 +3,14 @@ import {
   FormDataFunctions_FOR_TEST,
   FormDataFunctions,
 } from './formData'
-import { Validated, createValidated } from '../common/validated'
+import { Validated, valid } from '../common/validated'
 
 const Priv = FormDataFunctions_FOR_TEST
 const Funcs = FormDataFunctions
 
 test('checkPattern passes a valid zip code', () => {
   expect(
-    Priv.checkPattern(/\d{3}-\d{4}/, '')(createValidated('100-0001'))
+    Priv.checkPattern(/\d{3}-\d{4}/, '')(valid('100-0001'))
   ).toStrictEqual<Validated<string>>({
     value: '100-0001',
     hasError: false,
@@ -20,7 +20,7 @@ test('checkPattern passes a valid zip code', () => {
 
 test('checkPattern rejects if not match', () => {
   expect(
-    Priv.checkPattern(/^\d{3}-\d{4}$/, 'not match')(createValidated('abc'))
+    Priv.checkPattern(/^\d{3}-\d{4}$/, 'not match')(valid('abc'))
   ).toStrictEqual<Validated<string>>({
     value: 'abc',
     hasError: true,
@@ -29,7 +29,7 @@ test('checkPattern rejects if not match', () => {
 })
 
 test('normalizeZipFormat normalize a zip code with no "-"', () => {
-  expect(Priv.normalizeZipFormat(createValidated('1001234'))).toStrictEqual<
+  expect(Priv.normalizeZipFormat(valid('1001234'))).toStrictEqual<
     Validated<string>
   >({
     value: '100-1234',
@@ -39,7 +39,7 @@ test('normalizeZipFormat normalize a zip code with no "-"', () => {
 })
 
 test('normalizeToAscii normalize a zip code with no "-" with CJK', () => {
-  expect(Priv.normalizeToAscii(createValidated('１００-１２３４'))).toStrictEqual<
+  expect(Priv.normalizeToAscii(valid('１００-１２３４'))).toStrictEqual<
     Validated<string>
   >({
     value: '100-1234',
@@ -49,7 +49,7 @@ test('normalizeToAscii normalize a zip code with no "-" with CJK', () => {
 })
 
 test('checkEmpty rejects an empty string', () => {
-  expect(Priv.checkEmpty('empty')(createValidated(''))).toStrictEqual<
+  expect(Priv.checkEmpty('empty')(valid(''))).toStrictEqual<
     Validated<string>
   >({
     value: '',
@@ -58,7 +58,7 @@ test('checkEmpty rejects an empty string', () => {
   })
 })
 
-const initial = Funcs.initialize()
+const initial = Funcs.initialFormData
 
 test('validateName rejects an empty string', () => {
   expect(

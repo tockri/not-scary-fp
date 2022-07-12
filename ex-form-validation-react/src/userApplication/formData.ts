@@ -1,6 +1,6 @@
 import {
   Validated,
-  createValidated,
+  valid,
   ValidationFunc,
 } from '../common/validated'
 
@@ -83,6 +83,9 @@ const checkPattern =
       }
     }
 
+/**
+ * 小さい関数を単体テストするためのexport
+ */
 export const FormDataFunctions_FOR_TEST = {
   normalizeToAscii,
   normalizeToLower,
@@ -101,12 +104,12 @@ export type FormData = {
   readonly mailAddress: Validated<string>
 }
 
-const initialize = (): FormData => ({
-  name: createValidated(''),
-  zipCode: createValidated(''),
-  address: createValidated(''),
-  mailAddress: createValidated(''),
-})
+const initialFormData: FormData = {
+  name: valid(''),
+  zipCode: valid(''),
+  address: valid(''),
+  mailAddress: valid(''),
+}
 
 /**
  * FormDataを入力値で更新する関数
@@ -122,7 +125,7 @@ export type FormDataSetter = (
 const makeSetter = (key: keyof FormData, ...functions: ValidationFunc<string>[]): FormDataSetter =>
   (curr, value) => ({
     ...curr,
-    [key]: pipe(...functions)(createValidated(value))
+    [key]: pipe(...functions)(valid(value))
   })
 
 /**
@@ -191,7 +194,7 @@ const isSubmittable = (data: FormData): boolean => {
 }
 
 export const FormDataFunctions = {
-  initialize,
+  initialFormData,
   setNameOnTyping,
   setMailAddressOnTyping,
   setMailAddressOnFinish,

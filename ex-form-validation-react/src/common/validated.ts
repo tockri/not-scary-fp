@@ -4,7 +4,7 @@ export type Validated<T> = {
   readonly errorMessage: string
 }
 
-export const createValidated = <T>(value: T): Validated<T> => ({
+export const valid = <T>(value: T): Validated<T> => ({
   value,
   hasError: false,
   errorMessage: '',

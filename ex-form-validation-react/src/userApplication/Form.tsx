@@ -10,7 +10,7 @@ const Funcs = FormDataFunctions
 
 export const UserApplicationForm: React.FC = () => {
   const [formData, setFormData] = React.useState<FormData>(
-    Funcs.initialize()
+    Funcs.initialFormData
   )
   const makeListener =
     (setter: FormDataSetter) =>
