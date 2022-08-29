@@ -3,9 +3,9 @@ import { SortAlgorithm } from './SortAlgorithm'
 /**
  * Array.concatを関数型っぽい形にするための糖衣
  */
-const concat = (
-  arr: ReadonlyArray<number>,
-  ...others: ReadonlyArray<number | ReadonlyArray<number>>
+const concat = <T>(
+  arr: ReadonlyArray<T>,
+  ...others: ReadonlyArray<T | ReadonlyArray<T>>
 ) => arr.concat(...others)
 
 /**
