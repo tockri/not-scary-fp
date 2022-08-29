@@ -14,15 +14,17 @@ const ItemContainer = styled(Box)({
   width: '100%'
 })
 
+const itemSize = 30
+
 const ItemBox = styled(Box)({
   position: 'absolute',
-  transition: 'left .2s ease-in-out',
+  transition: 'left .4s ease-in-out',
   top: 10,
-  width: 25,
-  height: 25,
-  fontSize: 10,
+  width: itemSize,
+  height: itemSize,
+  fontSize: 14,
   textAlign: 'center',
-  paddingTop: 6
+  paddingTop: 4
 })
 
 type Item = { pos: number; changed: boolean }
@@ -52,7 +54,7 @@ export const SortAnimator: React.FC<SortAnimatorProps> = (props) => {
     if (frame < history.length - 1) {
       setTimeout(() => {
         setFrame(frame + 1)
-      }, 300)
+      }, 400)
     } else {
       if (history.length === 1) {
         setFrame(0)
@@ -74,7 +76,7 @@ export const SortAnimator: React.FC<SortAnimatorProps> = (props) => {
                   key={num}
                   id={`item-${num}`}
                   sx={{
-                    left: 30 * item.pos,
+                    left: (itemSize + 10) * item.pos,
                     backgroundColor:
                       item.changed && frame < history.length - 1
                         ? '#ffcc00'

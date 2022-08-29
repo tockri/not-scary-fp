@@ -74,7 +74,7 @@ export const App: React.FC = () => {
   )
 
   return (
-    <Box>
+    <Box margin={2}>
       <Stack spacing={1} direction="column" alignItems="flex-start">
         <StartButton algorithmName="bubbleSort" label="Bubble Sort" />
         <StartButton algorithmName="quickSort" label="Quick Sort" />
