@@ -27,23 +27,26 @@ const ItemBox = styled(Box)({
   paddingTop: 4
 })
 
-type Item = { pos: number; changed: boolean }
+type PosItem = {
+  value: number
+  pos: number
+  changed: boolean
+}
 
 const makePositions = (
-  data: ReadonlyArray<ReadonlyArray<number>>,
+  history: ReadonlyArray<ReadonlyArray<number>>,
   frame: number
-): Map<number, Item> => {
-  const idx = Math.min(frame, data.length - 1)
-  const prev = idx > 0 ? idx - 1 : idx
-  const items = data[idx]
-  const ret = new Map<number, Item>()
-  items.forEach((num, i) =>
-    ret.set(num, {
+): ReadonlyArray<PosItem> => {
+  const idx = Math.min(frame, history.length - 1)
+  const current = history[idx]
+  const prev = history[Math.max(idx - 1, 0)]
+  return current
+    .map((num, i) => ({
+      value: num,
       pos: i,
-      changed: items.length === data[prev].length && num !== data[prev][i]
-    })
-  )
-  return ret
+      changed: current.length === prev.length && num !== prev[i]
+    }))
+    .sort((i1, i2) => i1.value - i2.value)
 }
 
 export const SortAnimator: React.FC<SortAnimatorProps> = (props) => {
@@ -66,28 +69,21 @@ export const SortAnimator: React.FC<SortAnimatorProps> = (props) => {
   return (
     <Box>
       <ItemContainer>
-        {Array.from(positions.keys())
-          .sort()
-          .map((num, i) => {
-            const item = positions.get(num)
-            return (
-              item && (
-                <ItemBox
-                  key={num}
-                  id={`item-${num}`}
-                  sx={{
-                    left: (itemSize + 10) * item.pos,
-                    backgroundColor:
-                      item.changed && frame < history.length - 1
-                        ? '#ffcc00'
-                        : colors.grey[200]
-                  }}
-                >
-                  {num}
-                </ItemBox>
-              )
-            )
-          })}
+        {positions.map((item) => (
+          <ItemBox
+            key={item.value}
+            id={`item-${item.value}`}
+            sx={{
+              left: (itemSize + 10) * item.pos,
+              backgroundColor:
+                item.changed && frame < history.length - 1
+                  ? '#ffcc00'
+                  : colors.grey[200]
+            }}
+          >
+            {item.value}
+          </ItemBox>
+        ))}
       </ItemContainer>
       <Box>{frame}</Box>
     </Box>
