@@ -17,6 +17,19 @@ export type AlgorithmName = keyof typeof algorithms
 
 export type SortingHistory = ReadonlyArray<ReadonlyArray<number>>
 
+const assertArraysEqual = (
+  expected: ReadonlyArray<number>,
+  answer: ReadonlyArray<number>
+) => {
+  if (JSON.stringify(answer) !== JSON.stringify(expected)) {
+    console.log('failed', {
+      answer,
+      expected
+    })
+    throw new Error('Sort failed!')
+  }
+}
+
 export const recordSortingProcess = (
   initial: ReadonlyArray<number>,
   algorithmName: AlgorithmName
@@ -32,17 +45,4 @@ export const recordSortingProcess = (
   const answer = sorter(initial, capture)
   assertArraysEqual(expected, answer)
   return data
-}
-
-const assertArraysEqual = (
-  expected: ReadonlyArray<number>,
-  answer: ReadonlyArray<number>
-) => {
-  if (JSON.stringify(answer) !== JSON.stringify(expected)) {
-    console.log('failed', {
-      answer,
-      expected
-    })
-    throw new Error('Sort failed!')
-  }
 }
